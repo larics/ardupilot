@@ -931,8 +931,17 @@ void GCS_MAVLINK_Copter::handleMessage(const mavlink_message_t &msg)
             break;
         }
 
-        // ensure type_mask specifies to use attitude and thrust
-        if ((packet.type_mask & ((1<<7)|(1<<6))) != 0) {
+        // ensure type_mask specifies to use thrust
+        if ((packet.type_mask & (1<<6)) != 0) {
+            break;
+        }
+
+        // only one of these flags is true
+        bool use_body_rate_thrust = (packet.type_mask & (1<<7)) == 128;
+        bool use_yaw_rate = (packet.type_mask & ((1<<0) | (1<<1) | (1<<2))) == 3;
+        bool use_attitude = (packet.type_mask & ((1<<0) | (1<<1) | (1<<2))) == 7;
+        if (use_body_rate_thrust + use_yaw_rate + use_attitude > 1) {
+            ::printf("Invalid type_mask\n");
             break;
         }
 
@@ -949,15 +958,9 @@ void GCS_MAVLINK_Copter::handleMessage(const mavlink_message_t &msg)
             climb_rate_cms = (0.5f - packet.thrust) * 2.0f * -fabsf(copter.wp_nav->get_default_speed_down());
         }
 
-        // if the body_yaw_rate field is ignored, use the commanded yaw position
-        // otherwise use the commanded yaw rate
-        bool use_yaw_rate = false;
-        if ((packet.type_mask & (1<<2)) == 0) {
-            use_yaw_rate = true;
-        }
-
         copter.mode_guided.set_angle(Quaternion(packet.q[0],packet.q[1],packet.q[2],packet.q[3]),
             climb_rate_cms, use_yaw_rate, packet.body_yaw_rate);
+        copter.mode_guided.set_rate_bf_roll_pitch_yaw(packet.body_pitch_rate, packet.body_roll_rate, packet.body_yaw_rate, use_body_rate_thrust);
 
         break;
     }
