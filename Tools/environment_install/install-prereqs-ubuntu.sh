@@ -6,8 +6,9 @@ set -x
 MY_PYTHON="python"
 MY_PIP="pip2"
 
-[[ "$(python3 -V)" =~ "Python 3" ]] && MY_PYTHON=python3 && MY_PIP=pip3
-[[ "$(python -V)" =~ "Python 2" ]] && MY_PYTHON=python && MY_PIP=pip2
+distro=`lsb_release -r | awk '{ print $2 }'`
+[ "$distro" = "18.04" ] && MY_PYTHON=python3 && MY_PIP=pip3
+[ "$distro" = "20.04" ] && MY_PYTHON=python && MY_PIP=pip2
 
 echo "My python is: $MY_PYTHON"
 echo "My pip is: $MY_PIP"
