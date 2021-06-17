@@ -15,13 +15,15 @@ echo "My pip is: $MY_PIP"
 OPT="/opt"
 BASE_PKGS="build-essential ccache g++ gawk git make wget"
 PYTHON_PKGS="future lxml pymavlink MAVProxy pexpect"
-PX4_PKGS="$MY_PYTHON-argparse openocd flex bison libncurses5-dev \
+PX4_PKGS="openocd flex bison libncurses5-dev \
           autoconf texinfo libftdi-dev zlib1g-dev \
           zip genromfs $MY_PYTHON-empy cmake cmake-data"
 ARM_LINUX_PKGS="g++-arm-linux-gnueabihf pkg-config-arm-linux-gnueabihf"
 # python-wxgtk packages are added to SITL_PKGS below
-SITL_PKGS="libtool libxml2-dev libxslt1-dev $MY_PYTHON-dev $MY_PYTHON-pip $MY_PYTHON-setuptools $MY_PYTHON-matplotlib 
-    $MY_PYTHON-serial $MY_PYTHON-scipy $MY_PYTHON-opencv $MY_PYTHON-numpy $MY_PYTHON-pyparsing xterm lcov gcovr"
+SITL_PKGS="libtool libxml2-dev libxslt1-dev $MY_PYTHON-dev $MY_PYTHON-pip \
+            $MY_PYTHON-setuptools $MY_PYTHON-matplotlib $MY_PYTHON-serial \
+            $MY_PYTHON-scipy $MY_PYTHON-opencv $MY_PYTHON-numpy $MY_PYTHON-pyparsing \
+            xterm lcov gcovr"
 ASSUME_YES=false
 QUIET=false
 
@@ -31,6 +33,13 @@ if [ ${MACHINE_TYPE} == 'x86_64' ]; then
 else
   echo "no extra pkgs for i386"
 fi
+
+# Add back python symlink to python interpreter on Ubuntu >= 20.04
+if [ ${MY_PYTHON} == 'python3' ]; then
+    SITL_PKGS+=" libpython3-stdlib" # for argparse
+else
+    SITL_PKGS+=" python-argparse"
+fi 
 
 # GNU Tools for ARM Embedded Processors
 # (see https://launchpad.net/gcc-arm-embedded/)
