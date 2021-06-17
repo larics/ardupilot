@@ -3,15 +3,25 @@ echo "---------- $0 start ----------"
 set -e
 set -x
 
+MY_PYTHON="python"
+MY_PIP="pip2"
+
+[[ "$(python3 -V)" =~ "Python 3" ]] && MY_PYTHON=python3 && MY_PIP=pip3
+[[ "$(python -V)" =~ "Python 2" ]] && MY_PYTHON=python && MY_PIP=pip2
+
+echo "My python is: $MY_PYTHON"
+echo "My pip is: $MY_PIP"
+
 OPT="/opt"
 BASE_PKGS="build-essential ccache g++ gawk git make wget"
 PYTHON_PKGS="future lxml pymavlink MAVProxy pexpect"
-PX4_PKGS="python-argparse openocd flex bison libncurses5-dev \
+PX4_PKGS="$MY_PYTHON-argparse openocd flex bison libncurses5-dev \
           autoconf texinfo libftdi-dev zlib1g-dev \
-          zip genromfs python-empy cmake cmake-data"
+          zip genromfs $MY_PYTHON-empy cmake cmake-data"
 ARM_LINUX_PKGS="g++-arm-linux-gnueabihf pkg-config-arm-linux-gnueabihf"
 # python-wxgtk packages are added to SITL_PKGS below
-SITL_PKGS="libtool libxml2-dev libxslt1-dev python-dev python-pip python-setuptools python-matplotlib python-serial python-scipy python-opencv python-numpy python-pyparsing xterm lcov gcovr"
+SITL_PKGS="libtool libxml2-dev libxslt1-dev $MY_PYTHON-dev $MY_PYTHON-pip $MY_PYTHON-setuptools $MY_PYTHON-matplotlib 
+    $MY_PYTHON-serial $MY_PYTHON-scipy $MY_PYTHON-opencv $MY_PYTHON-numpy $MY_PYTHON-pyparsing xterm lcov gcovr"
 ASSUME_YES=false
 QUIET=false
 
@@ -97,7 +107,7 @@ if [ -n "$RP" ]; then
 fi
 
 $APT_GET install $BASE_PKGS $SITL_PKGS $PX4_PKGS $ARM_LINUX_PKGS
-pip2 -q install --user -U $PYTHON_PKGS
+$MY_PIP -q install --user -U $PYTHON_PKGS
 
 if [ ! -d $OPT/$ARM_ROOT ]; then
     (
