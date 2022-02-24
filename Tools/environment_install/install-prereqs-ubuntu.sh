@@ -3,7 +3,20 @@ echo "---------- $0 start ----------"
 set -e
 set -x
 
-if [ $EUID == 0 ]; then
+function heading() {
+    echo "$sep"
+    echo $*
+    echo "$sep"
+}
+
+heading "Check if we are inside docker environment..."
+IS_DOCKER=false
+if [[ -f /.dockerenv ]] || grep -Eq '(lxc|docker)' /proc/1/cgroup ; then
+    IS_DOCKER=true
+fi
+echo "Done!"
+
+if [ $EUID == 0 ] && [ $IS_DOCKER == "false" ]; then
     echo "Please do not run this script as root; don't sudo it!"
     exit 1
 fi
@@ -44,11 +57,6 @@ function package_is_installed() {
     dpkg-query -W -f='${Status}' "$1" 2>/dev/null | grep -c "ok installed"
 }
 
-function heading() {
-    echo "$sep"
-    echo $*
-    echo "$sep"
-}
 
 # Install lsb-release as it is needed to check Ubuntu version
 if ! package_is_installed "lsb-release"; then
@@ -221,7 +229,7 @@ if [ -n "$LBTBIN" ]; then
 fi
 
 # Install all packages
-$APT_GET install $BASE_PKGS $SITL_PKGS $PX4_PKGS $ARM_LINUX_PKGS $COVERAGE_PKGS
+$APT_GET install -y $BASE_PKGS $SITL_PKGS $PX4_PKGS $ARM_LINUX_PKGS $COVERAGE_PKGS
 $PIP install --user -U $PYTHON_PKGS
 
 if [[ -z "${DO_AP_STM_ENV}" ]] && maybe_prompt_user "Install ArduPilot STM32 toolchain [N/y]?" ; then
@@ -238,13 +246,6 @@ CCACHE_PATH=$(which ccache)
 if [[ $DO_AP_STM_ENV -eq 1 ]]; then
   install_arm_none_eabi_toolchain
 fi
-
-heading "Check if we are inside docker environment..."
-IS_DOCKER=false
-if [[ -f /.dockerenv ]] || grep -Eq '(lxc|docker)' /proc/1/cgroup ; then
-    IS_DOCKER=true
-fi
-echo "Done!"
 
 SHELL_LOGIN=".profile"
 if $IS_DOCKER; then
