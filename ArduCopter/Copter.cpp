@@ -387,7 +387,7 @@ bool Copter::set_target_angle_and_climbrate(float roll_deg, float pitch_deg, flo
     Quaternion q;
     q.from_euler(radians(roll_deg),radians(pitch_deg),radians(yaw_deg));
 
-    mode_guided.set_angle(q, Vector3f{}, climb_rate_ms*100, false);
+    mode_guided.set_angle(q, Vector3f{}, climb_rate_ms*100, false, false);
     return true;
 }
 
@@ -408,7 +408,7 @@ bool Copter::set_target_rate_and_throttle(float roll_rate_dps, float pitch_rate_
     ang_vel_body *= DEG_TO_RAD;
 
     // Pass to guided mode
-    mode_guided.set_angle(q, ang_vel_body, throttle, true);
+    mode_guided.set_angle(q, ang_vel_body, throttle, true, false);
     return true;
 }
 #endif
