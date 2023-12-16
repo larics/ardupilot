@@ -3,7 +3,20 @@ echo "---------- $0 start ----------"
 set -e
 set -x
 
-if [ $EUID == 0 ]; then
+function heading() {
+    echo "$sep"
+    echo $*
+    echo "$sep"
+}
+
+heading "Check if we are inside docker environment..."
+IS_DOCKER=false
+if [[ -f /.dockerenv ]] || grep -Eq '(lxc|docker)' /proc/1/cgroup ; then
+    IS_DOCKER=true
+fi
+echo "Done!"
+
+if [ $EUID == 0 ] && [ $IS_DOCKER == "false" ]; then
     echo "Please do not run this script as root; don't sudo it!"
     exit 1
 fi
@@ -312,13 +325,6 @@ CCACHE_PATH=$(which ccache)
 if [[ $DO_AP_STM_ENV -eq 1 ]]; then
   install_arm_none_eabi_toolchain
 fi
-
-heading "Check if we are inside docker environment..."
-IS_DOCKER=false
-if [[ -f /.dockerenv ]] || grep -Eq '(lxc|docker)' /proc/1/cgroup ; then
-    IS_DOCKER=true
-fi
-echo "Done!"
 
 SHELL_LOGIN=".profile"
 if $IS_DOCKER; then
