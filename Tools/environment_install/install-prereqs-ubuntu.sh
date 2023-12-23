@@ -11,7 +11,8 @@ function heading() {
 
 heading "Check if we are inside docker environment..."
 IS_DOCKER=false
-if [[ -f /.dockerenv ]] || grep -Eq '(lxc|docker)' /proc/1/cgroup ; then
+[ -z "${GITHUB_RUNNER}" ] && export GITHUB_RUNNER=false
+if [ "$GITHUB_RUNNER" = true ] || [[ -f /.dockerenv ]] || grep -Eq '(lxc|docker)' /proc/1/cgroup ; then
     IS_DOCKER=true
 fi
 echo "Done!"
