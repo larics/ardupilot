@@ -12,8 +12,8 @@
 //#define MODE_DRIFT_ENABLED    0            // disable drift mode support
 //#define MODE_FLIP_ENABLED     0            // disable flip mode support
 //#define MODE_FOLLOW_ENABLED   0            // disable follow mode support
-//#define MODE_GUIDED_ENABLED   0            // disable guided mode support
-//#define MODE_GUIDED_NOGPS_ENABLED   0      // disable guided/nogps mode support
+#define MODE_GUIDED_ENABLED   1            // disable guided mode support
+#define MODE_GUIDED_NOGPS_ENABLED   1      // disable guided/nogps mode support
 //#define MODE_LOITER_ENABLED   0            // disable loiter mode support
 //#define MODE_POSHOLD_ENABLED  0            // disable poshold mode support
 //#define MODE_RTL_ENABLED      0            // disable rtl mode support
